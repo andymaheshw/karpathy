@@ -1,25 +1,52 @@
 """
 The goal is to maximize the output
 """
+import math
 
 
-class Unit(Object):
+class Unit(object):
     def __init__(self, value, grad):
         self.value = value
         self.grad = grad
 
 
-class MultiplyGate(Object):
+class MultiplyGate(object):
 
-    def forward(u0, u1):
+    def forward(self, u0, u1):
         self.u0 = u0
         self.u1 = u1
-        self.utop = new Unit(u0.value * u1.value, 0)
+        self.utop = Unit(u0.value * u1.value, 0)
         return self.utop
 
-    def backward():
+    def backward(self):
         self.u0.grad += self.u1.value * self.utop.grad
         self.u1.grad += self.u0.value * self.utop.grad
+
+
+class AddGate(object):
+
+    def forward(self, u0, u1):
+        self.u0 = u0
+        self.u1 = u1
+        self.utop = Unit(u0.value + u1.value, 0)
+
+    def backward(self):
+        self.u0.grad += 1 * self.utop.grad
+        self.u1.grad += 1 * self.utop.grad
+
+
+class SigmoidGate(object):
+
+    def sigmoidGate(self, val):
+        return 1 / (1 + math.exp(-val))
+
+    def forward(self, u0):
+        self.u0 = u0
+        self.utop = Unit(self.sigmoidGate(self.u0.value), 0.0)
+
+    def backward(self):
+        s = self.sigmoidGate(self.u0.value)
+        self.u0.grad += (s * (1 - s)) * self.utop.grad
 
 
 def forwardMultiplyGate(x, y):
